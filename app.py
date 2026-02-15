@@ -6,6 +6,7 @@ import streamlit as st
 # CONFIG
 # =============================
 API_BASE =  "https://movie-recommendation-vzh6.onrender.com" or "http://127.0.0.1:8000"
+
 TMDB_IMG = "https://image.tmdb.org/t/p/w500"
 
 st.set_page_config(
@@ -79,7 +80,7 @@ section[data-testid="stSidebar"] {
 )
 
 # =============================
-# STATE
+# SESSION STATE
 # =============================
 if "view" not in st.session_state:
     st.session_state.view = "home"
@@ -110,7 +111,7 @@ def api_get_json(path, params=None):
         if r.status_code >= 400:
             return None
         return r.json()
-    except:
+    except Exception:
         return None
 
 
@@ -125,8 +126,9 @@ def poster_grid(cards, cols=6, key_prefix="grid"):
     rows = (len(cards) + cols - 1) // cols
     idx = 0
 
-    for r in range(rows):
+    for _ in range(rows):
         colset = st.columns(cols)
+
         for c in range(cols):
             if idx >= len(cards):
                 break
@@ -143,7 +145,7 @@ def poster_grid(cards, cols=6, key_prefix="grid"):
                 st.markdown('<div class="movie-card">', unsafe_allow_html=True)
 
                 if poster:
-                    st.image(poster, use_column_width=True)
+                    st.image(poster, use_container_width=True)
 
                 if rating:
                     st.markdown(
@@ -167,6 +169,7 @@ def poster_grid(cards, cols=6, key_prefix="grid"):
 # =============================
 with st.sidebar:
     st.markdown("## 🎬 Movie Menu")
+
     if st.button("🏠 Home"):
         goto_home()
 
@@ -187,6 +190,7 @@ st.title("🎬 Movie Recommender")
 st.caption("Search → Explore → Discover Similar Movies")
 st.divider()
 
+
 # =============================
 # HOME VIEW
 # =============================
@@ -194,7 +198,6 @@ if st.session_state.view == "home":
 
     typed = st.text_input("Search movie by title")
 
-    # 🔎 AUTOCOMPLETE
     if typed.strip() and len(typed.strip()) >= 2:
 
         with st.spinner("Searching... 🎥"):
@@ -202,31 +205,6 @@ if st.session_state.view == "home":
 
         if data:
             results = data.get("results", [])
-
-            suggestions = []
-            for m in results[:8]:
-                title = m.get("title")
-                year = (m.get("release_date") or "")[:4]
-                label = f"{title} ({year})" if year else title
-                suggestions.append(
-                    {
-                        "label": label,
-                        "id": m.get("id"),
-                        "vote": m.get("vote_average"),
-                    }
-                )
-
-            if suggestions:
-                selected_label = st.selectbox(
-                    "Suggestions",
-                    ["Select a movie..."] + [s["label"] for s in suggestions],
-                )
-
-                if selected_label != "Select a movie...":
-                    selected_movie = next(
-                        s for s in suggestions if s["label"] == selected_label
-                    )
-                    goto_details(selected_movie["id"])
 
             cards = [
                 {
@@ -247,7 +225,7 @@ if st.session_state.view == "home":
 
         st.stop()
 
-    # 🔥 HOME FEED
+    # HOME FEED
     st.subheader(f"🔥 {home_category.title()} Movies")
 
     with st.spinner("Loading movies... 🍿"):
@@ -279,7 +257,7 @@ elif st.session_state.view == "details":
 
     with col1:
         if details.get("poster_url"):
-            st.image(details["poster_url"], width="stretch")
+            st.image(details["poster_url"], use_container_width=True)
 
     with col2:
         st.header(details.get("title"))
