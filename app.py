@@ -143,7 +143,7 @@ def poster_grid(cards, cols=6, key_prefix="grid"):
                 st.markdown('<div class="movie-card">', unsafe_allow_html=True)
 
                 if poster:
-                    st.image(poster, width="stretch")
+                    st.image(poster, use_column_width=True)
 
                 if rating:
                     st.markdown(
