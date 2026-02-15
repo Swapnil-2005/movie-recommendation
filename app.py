@@ -145,7 +145,7 @@ def poster_grid(cards, cols=6, key_prefix="grid"):
                 st.markdown('<div class="movie-card">', unsafe_allow_html=True)
 
                 if poster:
-                    st.image(poster, use_container_width=True)
+                    st.image(poster, use_column_width=True)
 
                 if rating:
                     st.markdown(
@@ -257,7 +257,7 @@ elif st.session_state.view == "details":
 
     with col1:
         if details.get("poster_url"):
-            st.image(details["poster_url"], use_container_width=True)
+            st.image(details["poster_url"], use_column_width=True)
 
     with col2:
         st.header(details.get("title"))
